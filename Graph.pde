@@ -77,7 +77,7 @@ void drawGraph()
     OutputData[0] = int(outputHeight)-int(outputHeight*(Output-OutScaleMin)/(OutScaleMax-OutScaleMin));
   }
   //draw lines for the input, setpoint, and output
-  strokeWeight(2);
+  strokeWeight(4);
   for(int i=0; i<nPoints-2; i++)
   {
     int X1 = int(ioRight-2-float(i)*pointWidth);
