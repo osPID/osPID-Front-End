@@ -1,3 +1,25 @@
+void AdvanceData()
+{
+  // add the latest data to the data Arrays.  
+  if(millis() > nextRefresh && madeContact)
+  {
+    nextRefresh  = millis()+ refreshRate;
+
+    for(int i=nPoints-1;i>0;i--)
+    {
+      InputData[i]=InputData[i-1];
+      SetpointData[i]=SetpointData[i-1];
+      OutputData[i]=OutputData[i-1];
+    }
+    if (nPoints < arrayLength) nPoints++;
+
+    InputData[0] = Input;
+    SetpointData[0] = Setpoint;
+    OutputData[0] = Output;
+  }  
+}
+
+
 void drawGraph()
 {
   //draw Base, gridlines
@@ -54,28 +76,10 @@ void drawGraph()
   }
 
 
-  // add the latest data to the data Arrays.  the values need
-  // to be massaged to get them to graph correctly.  they 
-  // need to be scaled to fit where they're going, and 
-  // because 0, 0 is the top left, we need to flip the values.
-  // this is easier than having the user stand on their head
-  // to read the graph.
-  if(millis() > nextRefresh && madeContact)
-  {
-    nextRefresh += refreshRate;
 
-    for(int i=nPoints-1;i>0;i--)
-    {
-      InputData[i]=InputData[i-1];
-      SetpointData[i]=SetpointData[i-1];
-      OutputData[i]=OutputData[i-1];
-    }
-    if (nPoints < arrayLength) nPoints++;
-
-    InputData[0] = int(inputHeight)-int(inputHeight*(Input-InScaleMin)/(InScaleMax-InScaleMin));
-    SetpointData[0] =int( inputHeight)-int(inputHeight*(Setpoint-InScaleMin)/(InScaleMax-InScaleMin));
-    OutputData[0] = int(outputHeight)-int(outputHeight*(Output-OutScaleMin)/(OutScaleMax-OutScaleMin));
-  }
+  
+  AdvanceData();
+  
   //draw lines for the input, setpoint, and output
   strokeWeight(4);
   for(int i=0; i<nPoints-2; i++)
@@ -88,8 +92,8 @@ void drawGraph()
     //DRAW THE INPUT
     boolean drawLine=true;
     stroke(255,0,0);
-    int Y1 = InputData[i];
-    int Y2 = InputData[i+1];
+    int Y1 = int(inputHeight)-int(inputHeight*(InputData[i]-InScaleMin)/(InScaleMax-InScaleMin)); //InputData[i];
+    int Y2 = int(inputHeight)-int(inputHeight*(InputData[i+1]-InScaleMin)/(InScaleMax-InScaleMin)); //InputData[i+1];
 
     y1Above = (Y1>inputHeight);                     // if both points are outside 
     y1Below = (Y1<0);                               // the min or max, don't draw the 
@@ -127,8 +131,8 @@ void drawGraph()
     //DRAW THE SETPOINT
     drawLine=true;
     stroke(0,255,0);
-    Y1 = SetpointData[i];
-    Y2 = SetpointData[i+1];
+    Y1 = int(inputHeight)-int(inputHeight*(SetpointData[i]-InScaleMin)/(InScaleMax-InScaleMin));// SetpointData[i];
+    Y2 = int(inputHeight)-int(inputHeight*(SetpointData[i+1]-InScaleMin)/(InScaleMax-InScaleMin)); //SetpointData[i+1];
 
     y1Above = (Y1>(int)inputHeight);                // if both points are outside 
     y1Below = (Y1<0);                               // the min or max, don't draw the 
@@ -166,8 +170,8 @@ void drawGraph()
     //DRAW THE OUTPUT
     drawLine=true;
     stroke(0,0,255);
-    Y1 = OutputData[i];
-    Y2 = OutputData[i+1];
+    Y1 = int(outputHeight)-int(outputHeight*(OutputData[i]-OutScaleMin)/(OutScaleMax-OutScaleMin));// OutputData[i];
+    Y2 = int(outputHeight)-int(outputHeight*(OutputData[i+1]-OutScaleMin)/(OutScaleMax-OutScaleMin));//OutputData[i+1];
 
     y1Above = (Y1>outputHeight);                   // if both points are outside 
     y1Below = (Y1<0);                              // the min or max, don't draw the 

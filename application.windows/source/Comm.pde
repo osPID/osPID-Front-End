@@ -15,8 +15,12 @@ void Connect()
       {
         if ( r1.getItem(i).getState())
         {
-          myPort = new Serial(this, CommPorts[i], 115200); 
+          myPort = new Serial(this, CommPorts[i], 9600); 
           myPort.bufferUntil(10); 
+          //immediately send a request for osPID type;
+          byte[] typeReq = new byte[]{
+            0,0                              };
+          myPort.write(typeReq);
           break;
         }
       }
@@ -28,6 +32,8 @@ void Connect()
       ConnectButton.setVisible(true);
       Connecting.setVisible(false);
       DisconnectButton.setVisible(false);
+      commconfigLabel1.setVisible(true);
+      commconfigLabel2.setVisible(true);
     } 
 
   }
@@ -44,6 +50,10 @@ void Disconnect()
     ConnectButton.setVisible(true);
     Connecting.setVisible(false);
     DisconnectButton.setVisible(false);
+    commconfigLabel1.setVisible(true);
+    commconfigLabel2.setVisible(true);
+    ClearInput();
+    ClearOutput();
     Nullify();
   } 
 }
@@ -106,20 +116,81 @@ void Send_Configuration()//To_Controller()
   toSend[1] = float(BetaField.getText());
   toSend[2] = float(T0Field.getText());
   toSend[3] = float(oSecField.getText());
-  
+
   Byte a =0;
   if(r2.getState(1)==true)a=1;
   else if(r2.getState(2)==true)a=2;
-  
+
   byte o = r3.getState(0)==true ? (byte)0 : (byte)1;
-  
-println(o);
+
   byte identifier = 5;
   myPort.write(identifier);
   myPort.write(a);
   myPort.write(o);
   myPort.write(floatArrayToByteArray(toSend));
 } 
+void Run_Profile()
+{
+
+  byte[] toSend = new byte[2];
+  toSend[0]=8;
+  toSend[1]=1;
+  myPort.write(toSend);
+}
+void Stop_Profile()
+{
+  byte[] toSend = new byte[2];
+  toSend[0]=8;
+  toSend[1]=0;
+  myPort.write(toSend);
+}
+
+void Send_Profile()
+{
+  currentxferStep=0;
+  SendProfileStep(byte(currentxferStep));
+}
+int currentxferStep=-1;
+
+void SendProfileStep(byte step)
+{
+  byte identifier=7;
+  Profile p = profs[curProf];
+  float[] temp = new float[2];
+  temp[0] = p.vals[step];
+  temp[1] = p.times[step];
+
+  byte[] toSend = new byte[11];
+  toSend[0]=identifier;
+  toSend[1]=step;
+  toSend[2]=p.types[step];
+  arraycopy(floatArrayToByteArray(temp),0,toSend,3,8);
+  myPort.write(toSend);
+
+}
+
+void SendProfileName()
+{
+  byte identifier=7;
+
+
+  byte[] toSend = new byte[9];
+
+  toSend[0] = identifier;
+  toSend[1] = byte(currentxferStep);
+  try
+  {
+    byte[] n = profs[curProf].Name.getBytes();
+    int copylen = n.length>7? 7:n.length;
+    for(int i=0;i<7;i++) toSend[i+2] = i<copylen? n[i] : 32;
+
+  }
+  catch(Exception ex)
+  {
+    print(ex.toString());
+  }
+  myPort.write(toSend);
+}
 
 void Reset_Factory_Defaults()
 {
@@ -129,6 +200,22 @@ void Reset_Factory_Defaults()
 }
 
 byte[] floatArrayToByteArray(float[] input)
+{
+  int len = 4*input.length;
+  int index=0;
+  byte[] b = new byte[4];
+  byte[] out = new byte[len];
+  ByteBuffer buf = ByteBuffer.wrap(b);
+  for(int i=0;i<input.length;i++) 
+  {
+    buf.position(0);
+    buf.putFloat(input[i]);
+    for(int j=0;j<4;j++) out[j+i*4]=b[3-j];
+  }
+  return out;
+}
+
+byte[] intArrayToByteArray(int[] input)
 {
   int len = 4*input.length;
   int index=0;
@@ -160,6 +247,7 @@ float unflip(float thisguy)
 
 }
 
+String InputCreateReq="",OutputCreateReq="";
 //take the string the arduino sends us and parse it
 void serialEvent(Serial myPort)
 {
@@ -167,77 +255,144 @@ void serialEvent(Serial myPort)
   if(outputFileName!="") output.print(str(millis())+ " "+read);
   String[] s = split(read, " ");
   print(read);
-  
-  if(s.length==20)
+
+  if(s.length==4 && s[0].equals("osPID"))
   {
-   
+    if(InputCard=="" || !InputCard.equals(trim(s[2]))) InputCreateReq=trim(s[2]);
+    if(OutputCard=="" || !OutputCard.equals(trim(s[3]))) OutputCreateReq=trim(s[3]);
+    ConnectButton.setVisible(false);
+    Connecting.setVisible(false);
+    DisconnectButton.setVisible(true);
+    commconfigLabel1.setVisible(false);
+    commconfigLabel2.setVisible(false);
+    madeContact=true;
+  }
+  if(!madeContact) return;
+  if(s.length==6 && s[0].equals("DASH"))
+  {
+
     Setpoint = float(s[1]);
     Input = float(s[2]);
-    Output = float(s[3]);
-
+    Output = float(s[3]);  
     SPLabel.setValue(s[1]);           //   where it's needed
     InLabel.setValue(s[2]);           //
-    OutLabel.setValue(s[3]);          //
-    AMCurrent.setValue(int(s[16]) == 1 ? "Automatic" : "Manual");
-
-    PLabel.setValue(s[4]);
-    ILabel.setValue(s[5]);
-    DLabel.setValue(s[6]);
-    DRCurrent.setValue(int(s[17]) == 1 ? "Reverse" : "Direct");
-
-    String oS, n;
-    oSLabel.setValue(s[7]);
-    nLabel.setValue(s[8]);
-    lbLabel.setValue(s[9]);
-    ATCurrent.setValue(int(s[18])==1? "ATune On" : "ATune Off");
-
-    int ack = int(trim(s[19]));
-  
-    if(!madeContact || ack==1)
+    OutLabel.setValue(s[3]);  
+    AMCurrent.setValue(int(s[4]) == 1 ? "Automatic" : "Manual");    
+    //if(SPField.valueLabel().equals("---"))
+    if(dashNull || int(trim(s[5]))==1)
     {
+
+      dashNull=false;
       SPField.setText(s[1]);    //   the arduino,  take the
       InField.setText(s[2]);    //   current values and put
       OutField.setText(s[3]);
-      AMLabel.setValue(int(s[16]) == 1 ? "Automatic" : "Manual");   
-    }
-    if(!madeContact || ack==2)
-    {
-      PField.setText(s[4]);    //   the arduino,  take the
-      IField.setText(s[5]);    //   current values and put
-      DField.setText(s[6]);
-      DRLabel.setValue(int(s[17]) == 1 ? "Reverse" : "Direct");   
-    }
-    if(!madeContact || ack==3)
-    {
-      
-      oSField.setText(s[7]);
-      nField.setText(s[8]);
-      lbField.setValue(s[9]);    
-      ATLabel.setValue(int(s[18])==1? "ON" : "OFF");
-    }
-    if(!madeContact || ack==5)
-    {
-      int v = int(s[14]); 
-      if(v==0) r2.getItem(0).setState(true);
-      else if(v==1) r2.getItem(1).setState(true);
-      else r2.getItem(2).setState(true);
-      
-      v = int(s[15]);
-      if(v==0) r3.getItem(0).setState(true);
-      else r3.getItem(1).setState(true);
-
-      R0Field.setText(s[10]);    //   the arduino,  take the
-      BetaField.setText(s[11]);    //   current values and put
-      T0Field.setText(s[12]);
-      oSecField.setText(s[13]);   
-    }
-    if(!madeContact)
-    {
-      ConnectButton.setVisible(false);
-      Connecting.setVisible(false);
-      DisconnectButton.setVisible(true);
-      madeContact=true;    
+      AMLabel.setValue(int(s[4]) == 1 ? "Automatic" : "Manual");   
     }
   }
+  else if(s.length==10 && s[0].equals("TUNE"))
+  {
+    PLabel.setValue(s[1]);
+    ILabel.setValue(s[2]);
+    DLabel.setValue(s[3]);
+    DRCurrent.setValue(int(s[4]) == 1 ? "Reverse" : "Direct");
+    ATCurrent.setValue(int(s[5])==1? "ATune On" : "ATune Off");
+    oSLabel.setValue(s[6]);
+    nLabel.setValue(s[7]);
+    lbLabel.setValue(trim(s[8]));
+    if(tuneNull || int(trim(s[9]))==1)
+    {
+      tuneNull=false;
+      PField.setText(s[1]);    //   the arduino,  take the
+      IField.setText(s[2]);    //   current values and put
+      DField.setText(s[3]);
+      DRLabel.setValue(int(s[4]) == 1 ? "Reverse" : "Direct");  
+      oSField.setText(s[6]);
+      nField.setText(s[7]);
+      lbField.setValue(s[8]);    
+      ATLabel.setValue(int(s[5])==1? "ON" : "OFF");
+    }
+
+  }
+  else if(s[0].equals("IPT") && InputCard != null)
+  {
+    PopulateCardFields(InputCard, s);
+  }
+  else if(s[0].equals("OPT") && OutputCard != null)  
+  {
+    PopulateCardFields(OutputCard, s);
+  }
+  else if( s.length>3 && s[0].equals("PROF"))
+  {
+    lastReceiptTime=millis();
+    int curType = int(trim(s[2]));
+    curProfStep = int(s[1]);
+    ProfCmd.setVisible(false);
+    ProfCmdStop.setVisible(true);
+    String[] msg;
+    switch(curType)
+    {
+    case 1: //ramp
+      msg = new String[]{
+        "Running Profile", "", "Step="+s[1]+", Ramping Setpoint", float(trim(s[3]))/1000+" Sec remaining"            };
+      break;
+    case 2: //wait
+      float helper = float(trim(s[4]));
+      msg = new String[]{
+        "Running Profile", "","Step="+s[1]+", Waiting","Distance Away= "+s[3],(helper<0? "Waiting for cross" :("Time in band= "+helper/1000+" Sec" ))            };
+      break;
+    case 3: //step
+      msg = new String[]{
+        "Running Profile", "","Step="+s[1]+", Stepped Setpoint"," Waiting for "+ float(trim(s[3]))/1000+" Sec"            };
+      break;
+
+    default:
+      msg = new String[0];
+      break;
+    }
+    poulateStat(msg);
+  }
+  else if(trim(s[0]).equals("P_DN"))
+  {
+    lastReceiptTime = millis()-10000;
+    ProfileRunTime();
+  }
+
+  if(s.length==5 && s[0].equals("ProfAck"))
+  {
+    lastReceiptTime=millis();
+    String[] profInfo = new String[]{
+      "Transferring Profile","Step "+s[1]+" successful"            };
+    poulateStat(profInfo);
+    currentxferStep = int(s[1])+1;
+    if(currentxferStep<pSteps) SendProfileStep(byte(currentxferStep));
+    else if(currentxferStep>=pSteps) SendProfileName();
+
+  }
+  else if(s[0].equals("ProfDone"))
+  {
+    lastReceiptTime=millis()+7000;//extra display time
+    String[] profInfo = new String[]{
+      "Profile Transfer","Profile Sent Successfully"        };
+    poulateStat(profInfo);
+    currentxferStep=0;
+  }
+  else if(s[0].equals("ProfError"))
+  {
+    lastReceiptTime=millis()+7000;//extra display time
+    String[] profInfo = new String[]{
+      "Profile Transfer","Error Sending Profile"            };
+    poulateStat(profInfo);
+  }
 }
+
+void poulateStat(String[] msg)
+{
+  for(int i=0;i<6;i++)
+  {
+    ((controlP5.Textlabel)controlP5.controller("dashstat"+i)).setValue(i<msg.length?msg[i]:"");
+    ((controlP5.Textlabel)controlP5.controller("profstat"+i)).setValue(i<msg.length?msg[i]:"");
+  }
+}
+
+
 

@@ -1,8 +1,8 @@
 /********************************************************
- * os PID Tuning Front-End,  Version 0.0
+ * os PID Tuning Front-End,  Version 0.5
  * by Brett Beauregard
  * License: GPLv3
- * November 2011
+ * April 2012
  *
  * This application is written in processing and is
  * designed to interface with the osPID.  From this 
@@ -14,3 +14,9 @@
  * http://www.sojamo.de/libraries/controlP5/
  * 
  ********************************************************/
+
+Updates for version 0.5
+- Support for different types of IO cards
+- reflow profile support
+- minor graph bug fixes
+
