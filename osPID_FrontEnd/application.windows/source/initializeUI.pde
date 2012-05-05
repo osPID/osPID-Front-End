@@ -15,6 +15,12 @@ void createTabs()
   controlP5.tab("Tab3").activateEvent(true);
   controlP5.tab("Tab3").setId(4);
   controlP5.tab("Tab3").setLabel("Prefs");
+  
+   // in case you want to receive a controlEvent when
+  // a  tab is clicked, use activeEvent(true)
+  controlP5.tab("Tab4").activateEvent(true);
+  controlP5.tab("Tab4").setId(5);
+  controlP5.tab("Tab4").setLabel("Profile");
 
   controlP5.tab("default").activateEvent(true);
   // to rename the label of a tab, use setLabe("..."),
@@ -63,7 +69,13 @@ void populateDashTab()
   SPLabel=controlP5.addTextlabel("SP","3",dashLeft+70,dashTop+43);                  //
   InLabel=controlP5.addTextlabel("In","1",dashLeft+70,dashTop+83);                  //
   OutLabel=controlP5.addTextlabel("Out","2",dashLeft+70,dashTop+123);                // 
-  controlP5.addButton("Send_Dash",0.0,dashLeft,dashTop+160,120,20);         //
+  controlP5.addButton("Send_Dash",0.0,dashLeft,dashTop+160,160,20);         //
+  int dashStatTop = configTop+490;
+  for(int i=0;i<6;i++)
+ { 
+   controlP5.addTextlabel("dashstat"+i, "", configLeft, dashStatTop+12*i+5);
+ }
+  controlP5.addTextlabel("dashstatus", "Status", configLeft+9, dashStatTop-8);
 }
 
 void populateTuneTab()
@@ -79,7 +91,7 @@ void populateTuneTab()
   ILabel=controlP5.addTextlabel("I","5",tuneLeft+70,tuneTop+43);                    //
   DLabel=controlP5.addTextlabel("D","6",tuneLeft+70,tuneTop+83);                    //
   DRCurrent = controlP5.addTextlabel("DRCurrent","Direct",tuneLeft+70,tuneTop+123);   //
-  controlP5.addButton("Send_Tunings",0.0,tuneLeft,tuneTop+160,120,20);         //  
+  controlP5.addButton("Send_Tunings",0.0,tuneLeft,tuneTop+160,160,20);         //  
 
   PField.moveTo("Tab1"); 
   IField.moveTo("Tab1"); 
@@ -105,7 +117,7 @@ void populateTuneTab()
   nLabel=controlP5.addTextlabel("noise","5",ATLeft+70,ATTop+43); 
   lbLabel=controlP5.addTextlabel("lback","5",ATLeft+70,ATTop+83);   //
   ATCurrent = controlP5.addTextlabel("ATuneCurrent","Start",ATLeft+70,ATTop+123);   //
-  controlP5.addButton("Send_Auto_Tune",0.0,ATLeft,ATTop+160,120,20);         //  
+  controlP5.addButton("Send_Auto_Tune",0.0,ATLeft,ATTop+160,160,20);         //  
 
   oSField.moveTo("Tab1"); 
   nField.moveTo("Tab1"); 
@@ -121,61 +133,13 @@ void populateTuneTab()
 
 void populateConfigTab()
 {
-  controlP5.addButton("Reset_Factory_Defaults",0.0,RsLeft,RsTop,120,20);         //
+  controlP5.addButton("Reset_Factory_Defaults",0.0,RsLeft,RsTop,160,20);         //
   controlP5.controller("Reset_Factory_Defaults").moveTo("Tab2");
 
-  //configuration
-  controlP5.addTextlabel("spec0","Specify which input to use: ", configLeft,configTop);                  
-
-  r2 = controlP5.addRadioButton("radioButton2",configLeft,configTop+22);
-  r2.setColorForeground(color(120));
-  r2.setColorActive(color(255));
-  r2.setColorLabel(color(255));
-  r2.setItemsPerRow(1);
-  r2.setSpacingColumn(75);
-
-  addToRadioButton(r2,"Thermocouple",1);
-  addToRadioButton(r2,"Thermistor (10K)",2);
-  addToRadioButton(r2,"Thermistor (100K)",3);
-  r2.getItem(0).setState(true);
-
-  controlP5.addTextlabel("spec1","Thermistor Coefficients: ", configLeft,configTop+70);
-  controlP5.addTextlabel("T","T    =", configLeft+5,configTop+90);
-  controlP5.addTextlabel("00","0", configLeft+10,configTop+95);
-  controlP5.addTextlabel("R","R    =", configLeft+5,configTop+115);
-  controlP5.addTextlabel("01","0", configLeft+12,configTop+120);
-  controlP5.addTextlabel("Beta","Beta =", configLeft+5,configTop+140);
-  T0Field= controlP5.addTextfield("",configLeft+45,configTop+84,60,20);         //   Buttons, Labels, and
-  R0Field = controlP5.addTextfield(" ",configLeft+45,configTop+109,60,20);           //   Text Fields we'll be
-  BetaField = controlP5.addTextfield("  ",configLeft+45,configTop+136,60,20);         //   using
-
-  controlP5.addTextlabel("spec3","Specify which output to use: ", configLeft,configTop+166);                  
-
-  r3 = controlP5.addRadioButton("radioButton3",configLeft,configTop+188);
-  r3.setColorForeground(color(120));
-  r3.setColorActive(color(255));
-  r3.setColorLabel(color(255));
-  r3.setItemsPerRow(1);
-  r3.setSpacingColumn(75);
-
-  addToRadioButton(r3,"Onboard Relay",1);
-  addToRadioButton(r3,"Digital Output",2);
-  r3.getItem(0).setState(true);
-
-  controlP5.addTextlabel("spec2","Relay Output Window: ", configLeft,configTop+222);  
-  controlP5.addTextlabel("sec","Seconds = ", configLeft+5,configTop+242);  
-  oSecField = controlP5.addTextfield("   ",configLeft+55,configTop+236,50,20);
-  controlP5.addButton("Send_Configuration",0.0,configLeft,configTop+260,120,20);         //  
-
-  String[] names = {
-    "spec0","spec1","spec2","spec3","sec", "T","   ", "00", "R", "01", "Beta", "Send_Configuration"      };
-  for(int i=0;i<names.length;i++)controlP5.controller(names[i]).moveTo("Tab2");
-  r2.moveTo("Tab2"); 
-  r3.moveTo("Tab2"); 
-  T0Field.moveTo("Tab2"); 
-  R0Field.moveTo("Tab2"); 
-  BetaField.moveTo("Tab2");  
-
+commconfigLabel1 = controlP5.addTextlabel("spec6","This area will populate when", configLeft,configTop); 
+commconfigLabel2 = controlP5.addTextlabel("spec7","connection is established.", configLeft,configTop+15); 
+commconfigLabel1.moveTo("Tab2");
+commconfigLabel2.moveTo("Tab2");
 }
 
 void populatePrefTab()
@@ -187,10 +151,39 @@ void populatePrefTab()
     controlP5.controller(prefs[i]).moveTo("Tab3");
   }
 
-  controlP5.addButton("Save_Preferences", 0.0, 10,30+40*prefs.length,120,20);
+  controlP5.addButton("Save_Preferences", 0.0, 10,30+40*prefs.length,160,20);
   controlP5.controller("Save_Preferences").moveTo("Tab3");
 
   PopulatePrefVals(); 
+}
+
+void populateProfileTab(){
+ LBPref = controlP5.addListBox("Available Profiles",configLeft,configTop+5,160,120);
+ controlP5.addTextlabel("spec4","Currently Displaying: ", configLeft+5,configTop+10+15*profs.length);
+ ProfButton = controlP5.addButton("Send_Profile",0.0,configLeft,configTop+25+15*profs.length,160,20);
+
+
+ int profStatTop = configTop+490;
+  ProfCmd = controlP5.addButton("Run_Profile",0.0,configLeft,profStatTop-40,160,20);
+  ProfCmdStop = controlP5.addButton("Stop_Profile",0.0,configLeft,profStatTop-40,160,20);
+  ProfCmdStop.setVisible(false);
+ for(int i=0;i<6;i++)
+ { 
+   controlP5.addTextlabel("profstat"+i,"", configLeft, profStatTop+12*i+5);
+   controlP5.controller("profstat"+i).moveTo("Tab4");
+ }
+ controlP5.addTextlabel("profstatus", "Status", configLeft+9, profStatTop-8);
+   controlP5.controller("profstatus").moveTo("Tab4");
+ 
+ for(int i=0;i<profs.length;i++) LBPref.addItem(profs[i].Name, i);
+ profSelLabel  = controlP5.addTextlabel("spec5",profs.length==0? "N/A" : profs[0].Name, configLeft+100,configTop+10+15*profs.length); 
+ 
+ LBPref.moveTo("Tab4");
+ profSelLabel.moveTo("Tab4");
+  ProfButton.moveTo("Tab4");
+  ProfCmd.moveTo("Tab4");
+  ProfCmdStop.moveTo("Tab4");
+ controlP5.controller("spec4").moveTo("Tab4");
 }
 
 void addToRadioButton(RadioButton theRadioButton, String theName, int theValue ) {
@@ -200,3 +193,4 @@ void addToRadioButton(RadioButton theRadioButton, String theName, int theValue )
   t.captionLabel().style().moveMargin(-2,0,0,-3);
   t.captionLabel().style().backgroundWidth = 100;
 }
+

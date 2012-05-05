@@ -1,7 +1,0 @@
-Reflow 			//first row is profile name
-3, 50, 0		//step (3) setpoint to (50) and wait (0) seconds
-2, 0, 0			//wait (2) for input to cross (0) setpoint. (last column not used)
-1, 100, 60.12		//ramp (1) setpoint to (100) over the course of (60.12) seconds.
-3, 100, 10.1		//step (3) setpoint to (100) and wait (10.1) seconds.
-3, 25, 0		//step (3) setpoint to (25) and wait (0) seconds.
-2, 5, 10		//wait (2) for input to be within (5) of setpoint for (10) seconds.
