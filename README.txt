@@ -9,7 +9,7 @@
  * Control Panel you can observe & adjust PID 
  * performance in  real time
  *
- * The ControlP5 library is required to run this sketch.
+ * The ControlP5 library (v0.5.4) is required to run this sketch.
  * files and install instructions can be found at
  * http://www.sojamo.de/libraries/controlP5/
  * 
