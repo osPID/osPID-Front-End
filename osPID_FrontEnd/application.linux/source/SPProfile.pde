@@ -95,8 +95,11 @@ Profile CreateProfile(String filename)
           ret.times[count-1] = time;
           if(time<0)ret.errorMsg = "Time cannot be negative";
           else if(t==2 && v<0)ret.errorMsg = "Wait Band cannot be negative";
-          else if(t<0 || t>3)ret.errorMsg = "Unrecognized step type";
-
+          else if(t<0 || (t>3 && t!=127))
+          {
+            ret.errorMsg = "Unrecognized step type";
+          }
+    
           if(ret.errorMsg!="") ret.errorMsg = "Error on line "+ (count+1)+". "+ret.errorMsg;
         }
       }
@@ -153,7 +156,7 @@ textFont(AxisFont);
     if(t==1)//Ramp
     {
       line(x1,lasty, x2,v);
-      text(p.vals[i],x2,v);
+      text(p.vals[i],x2,v-4);
       lasty=v;
     }
     else if(t==2)//Wait
@@ -167,7 +170,11 @@ textFont(AxisFont);
       line(x1,lasty, x1,v);
       line(x1,v, x2,v);
       lasty=v;
-      text(p.vals[i],x1,lasty);
+      text(p.vals[i],x1,lasty-4);
+    }
+    else if(t==127)//Buzz
+    {
+      line(x1,lasty, x2,lasty);
     }
     else if(t==0)
     {
@@ -213,6 +220,10 @@ break;
     {
       s1 = "Step SP to "+ v +" then"; 
       s2="wait " + p.times[i] + " Sec";
+    }
+    else if(t==127)
+    {
+      s1 = "Buzz for " + p.times[i] + " Sec"; 
     }
     else
     { //unrecognized
