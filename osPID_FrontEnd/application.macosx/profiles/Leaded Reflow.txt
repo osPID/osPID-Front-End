@@ -1,0 +1,14 @@
+Leaded		//first row is Profile Name
+3, 30, 0	//Step Setpoint to 30, wait 0 seconds
+2, 0, 0		//Wait for PID Input to cross setpoint 
+1, 100, 60	//ramp setpoint to 100 over the course of 60 seconds
+2, 0, 0		//Wait for PID Input to cross setpoint 
+1, 180, 90	//ramp setpoint to 180 over the course of 90 seconds
+2, 0, 0		//Wait for PID Input to cross setpoint 
+1, 220, 90	//ramp setpoint to 220 over the course of 90 seconds
+2, 0, 0		//Wait for PID Input to cross setpoint
+1, 180, 30	//ramp setpoint to 180 over the course of 30 seconds
+2, 0, 0		//Wait for PID Input to cross setpoint
+1, 50, 150	//ramp setpoint to 50 over the course of 150 seconds
+2, 0, 0		//Wait for PID Input to cross setpoint
+127, 0, 5	//buzz for 5 seconds
