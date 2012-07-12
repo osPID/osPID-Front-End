@@ -134,7 +134,7 @@ public void setup()
   PrefsToVals(); //read pref array into global variables
 
     String curDir = System.getProperty("user.dir");
-  ReadProfiles(curDir+"\\profiles");
+  ReadProfiles(curDir+ File.separator + "profiles");
 
 
 
@@ -1481,7 +1481,7 @@ public void ReadProfiles(String directory)
   profs = new Profile[files.length];
   for(int i=0;i<files.length;i++)
   {
-    profs[i] = CreateProfile(directory+"\\"+files[i]); 
+    profs[i] = CreateProfile(directory+ File.separator +files[i]); 
   }
   if(profs.length>0)curProf=0;
 }

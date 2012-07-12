@@ -41,7 +41,7 @@ void ReadProfiles(String directory)
   profs = new Profile[files.length];
   for(int i=0;i<files.length;i++)
   {
-    profs[i] = CreateProfile(directory+"\\"+files[i]); 
+    profs[i] = CreateProfile(directory+ File.separator +files[i]); 
   }
   if(profs.length>0)curProf=0;
 }
