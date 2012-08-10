@@ -34,11 +34,11 @@ void ClearOutput()
 
 void CreateUI(String cardID, String tab, int top)
 {
-  if(cardID.equals("IID1"))
+  if(cardID.equals("IID1") || cardID.equals("IID2"))
   {
 
     ClearInput();
-    InputCard = "IID1";
+    InputCard = cardID;
     InputControls.clear();
 
 
@@ -307,7 +307,7 @@ else if(cardID.equals("OID0"))
 
 void PopulateCardFields(String cardName, String[] fields)
 {
-  if(cardName.equals("IID1"))
+  if(cardName.equals("IID1") || cardName.equals("IID2"))
   {
     int v = int(fields[1]); 
     if(v==0) r2.getItem(0).setState(true);
@@ -365,7 +365,7 @@ void PopulateCardFields(String cardName, String[] fields)
 void Send_Input_Config()
 {  //build the send string for the appropriate input card
 
-  if(InputCard.equals("IID1"))
+  if(InputCard.equals("IID1") || InputCard.equals("IID2"))
   {
     myPort.write(byte(5));
     Byte a =0;

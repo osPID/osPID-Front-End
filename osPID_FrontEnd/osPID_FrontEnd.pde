@@ -134,10 +134,6 @@ void setup()
   nextRefresh=millis();
   if (outputFileName!="") output = createWriter(outputFileName);
 
-  /*
-  CreateUI("IID1", "Tab2",configTop);
-    CreateUI("OID1", "Tab2",configTop+configH+15);
-*/
 
 }
 
