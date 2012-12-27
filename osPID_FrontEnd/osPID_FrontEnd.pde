@@ -111,8 +111,7 @@ void setup()
 
   PrefsToVals(); //read pref array into global variables
 
-    String curDir = System.getProperty("user.dir");
-  ReadProfiles(curDir+ File.separator + "profiles");
+  ReadProfiles(sketchPath("") + File.separator + "profiles");
 
 
 
