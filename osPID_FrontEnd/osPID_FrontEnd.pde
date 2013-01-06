@@ -1,6 +1,7 @@
 import java.nio.ByteBuffer;
 import processing.serial.*;
 import controlP5.*;
+import java.io.*;
 
 /***********************************************
  * User spcification section
@@ -110,8 +111,7 @@ void setup()
 
   PrefsToVals(); //read pref array into global variables
 
-    String curDir = System.getProperty("user.dir");
-  ReadProfiles(curDir+ File.separator + "profiles");
+  ReadProfiles(sketchPath("") + File.separator + "profiles");
 
 
 
