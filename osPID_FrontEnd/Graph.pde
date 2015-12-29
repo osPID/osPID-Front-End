@@ -37,10 +37,10 @@ void drawGraph()
 
   if(!madeContact) return;
 
-  //GridLines and Titles
+  // GridLines and Titles
   textFont(AxisFont);
 
-  //horizontal grid lines
+  // Horizontal grid lines
   int interval = (int)inputHeight/5;
   for(int i=0;i<6;i++)
   {
@@ -55,7 +55,7 @@ void drawGraph()
     text(str((OutScaleMax-OutScaleMin)/5*(float)(5-i)+OutScaleMin),ioRight+5,outputTop+i*interval+4);
   }
 
-  //vertical grid lines and TimeStamps
+  // Vertical grid lines and TimeStamps
   int elapsedTime = millis()-startTime;
   interval = (int)ioWidth / vertCount;
   int shift = elapsedTime*(int)ioWidth / windowSpan;
@@ -75,12 +75,9 @@ void drawGraph()
     if(t>=0)  text(str(t),x,outputTop+outputHeight+10);
   }
 
-
-
-  
   AdvanceData();
   
-  //draw lines for the input, setpoint, and output
+  // Draw lines for the input, setpoint, and output
   strokeWeight(4);
   for(int i=0; i<nPoints-2; i++)
   {

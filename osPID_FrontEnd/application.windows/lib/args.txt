@@ -1,3 +1,0 @@
-
-osPID_FrontEnd
-osPID_FrontEnd.jar,core.jar,serial.jar,RXTXcomm.jar,controlP5.jar

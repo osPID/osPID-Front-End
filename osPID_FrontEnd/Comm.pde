@@ -1,29 +1,34 @@
 String LastError="";
 void Connect()
 {
-
+  if(ConnectButton==null)return;
   if(!madeContact)
   {
     try
     {
       LastError="";
       ConnectButton.setVisible(false);
+
       Connecting.setVisible(true);
       nPoints=0;
       startTime= millis();
-      for(int i=0;i<CommPorts.length;i++)
+      
+      int selected=int(r1.getValue());
+      println(selected);
+      
+      /*for(int i=0;i<CommPorts.length;i++)
       {
         if ( r1.getItem(i).getState())
-        {
-          myPort = new Serial(this, CommPorts[i], 9600); 
+        {*/
+          myPort = new Serial(this, CommPorts[selected], 9600); 
           myPort.bufferUntil(10); 
           //immediately send a request for osPID type;
           byte[] typeReq = new byte[]{
             0,0                              };
           myPort.write(typeReq);
-          break;
+        /*  break;
         }
-      }
+      }*/
     }
     catch (Exception ex)
     {
@@ -35,16 +40,16 @@ void Connect()
       commconfigLabel1.setVisible(true);
       commconfigLabel2.setVisible(true);
     } 
-
   }
 
 }
 
 void Disconnect()
 {
+  
+  if(DisconnectButton==null)return;
   if(madeContact)
-  {
-
+  {    
     myPort.stop();
     madeContact=false;
     ConnectButton.setVisible(true);
@@ -68,14 +73,14 @@ void Disconnect()
 // - send those bytes to the arduino
 void Send_Dash()//To_Controller()
 {
-
+if(myPort==null)return;
 
   float[] toSend = new float[3];
   toSend[0] = float(SPField.getText());
   toSend[1] = float(InField.getText());
   toSend[2] = float(OutField.getText());
 
-  Byte a = (AMLabel.valueLabel().getText()=="Manual")?(byte)0:(byte)1;
+  Byte a = (AMLabel.getValueLabel().getText()=="Manual")?(byte)0:(byte)1;
   byte identifier = 1;
   myPort.write(identifier);
   myPort.write(a);
@@ -84,8 +89,9 @@ void Send_Dash()//To_Controller()
 
 void Send_Tunings()
 {
+  if(myPort==null)return;
   float[] toSend = new float[3];
-  Byte d = (DRLabel.valueLabel().getText()=="Direct")?(byte)0:(byte)1;
+  Byte d = (DRLabel.getValueLabel().getText()=="Direct")?(byte)0:(byte)1;
   toSend[0] = float(PField.getText());
   toSend[1] = float(IField.getText());
   toSend[2] = float(DField.getText());
@@ -97,8 +103,9 @@ void Send_Tunings()
 
 void Send_Auto_Tune()
 {
+  if(myPort==null)return;
   float[] toSend = new float[3];
-  Byte d = (ATLabel.valueLabel().getText()=="OFF")?(byte)0:(byte)1;
+  Byte d = (ATLabel.getValueLabel().getText()=="OFF")?(byte)0:(byte)1;
   toSend[0] = float(oSField.getText());
   toSend[1] = float(nField.getText());
   toSend[2] = float(lbField.getText());
@@ -110,7 +117,7 @@ void Send_Auto_Tune()
 
 void Send_Configuration()//To_Controller()
 {
-
+  if(myPort==null)return;
   float[] toSend = new float[4];
   toSend[0] = float(R0Field.getText());
   toSend[1] = float(BetaField.getText());
@@ -131,7 +138,7 @@ void Send_Configuration()//To_Controller()
 } 
 void Run_Profile()
 {
-
+  if(myPort==null)return;
   byte[] toSend = new byte[2];
   toSend[0]=8;
   toSend[1]=1;
@@ -139,6 +146,7 @@ void Run_Profile()
 }
 void Stop_Profile()
 {
+  if(myPort==null)return;
   byte[] toSend = new byte[2];
   toSend[0]=8;
   toSend[1]=0;
@@ -147,13 +155,18 @@ void Stop_Profile()
 
 void Send_Profile()
 {
+  println("send_profile1");
+  if(myPort==null)return;
   currentxferStep=0;
   SendProfileStep(byte(currentxferStep));
+  println("send_profile2");
 }
 int currentxferStep=-1;
 
 void SendProfileStep(byte step)
 {
+  
+  if(myPort==null)return;
   byte identifier=7;
   Profile p = profs[curProf];
   float[] temp = new float[2];
@@ -164,20 +177,22 @@ void SendProfileStep(byte step)
   toSend[0]=identifier;
   toSend[1]=step;
   toSend[2]=p.types[step];
-  arraycopy(floatArrayToByteArray(temp),0,toSend,3,8);
+  arrayCopy(floatArrayToByteArray(temp),0,toSend,3,8);
   myPort.write(toSend);
 
 }
 
 void SendProfileName()
 {
+  if(myPort==null)return;
   byte identifier=7;
-
+print("sendprofilename1");
 
   byte[] toSend = new byte[9];
 
   toSend[0] = identifier;
   toSend[1] = byte(currentxferStep);
+print("sendprofilename2");
   try
   {
     byte[] n = profs[curProf].Name.getBytes();
@@ -190,10 +205,12 @@ void SendProfileName()
     print(ex.toString());
   }
   myPort.write(toSend);
+  print("sendprofilename3");
 }
 
 void Reset_Factory_Defaults()
 {
+  if(myPort==null)return;
   byte identifier = 4;
   myPort.write(identifier);
   myPort.write((byte)1); 
@@ -202,7 +219,7 @@ void Reset_Factory_Defaults()
 byte[] floatArrayToByteArray(float[] input)
 {
   int len = 4*input.length;
-  int index=0;
+  //int index=0;
   byte[] b = new byte[4];
   byte[] out = new byte[len];
   ByteBuffer buf = ByteBuffer.wrap(b);
@@ -218,7 +235,7 @@ byte[] floatArrayToByteArray(float[] input)
 byte[] intArrayToByteArray(int[] input)
 {
   int len = 4*input.length;
-  int index=0;
+  //int index=0;
   byte[] b = new byte[4];
   byte[] out = new byte[len];
   ByteBuffer buf = ByteBuffer.wrap(b);
@@ -265,6 +282,7 @@ void serialEvent(Serial myPort)
     DisconnectButton.setVisible(true);
     commconfigLabel1.setVisible(false);
     commconfigLabel2.setVisible(false);
+
     madeContact=true;
   }
   if(!madeContact) return;
@@ -389,10 +407,7 @@ void poulateStat(String[] msg)
 {
   for(int i=0;i<6;i++)
   {
-    ((controlP5.Textlabel)controlP5.controller("dashstat"+i)).setValue(i<msg.length?msg[i]:"");
-    ((controlP5.Textlabel)controlP5.controller("profstat"+i)).setValue(i<msg.length?msg[i]:"");
+    ((controlP5.Textlabel)controlP5.getController("dashstat"+i)).setValue(i<msg.length?msg[i]:"");
+    ((controlP5.Textlabel)controlP5.getController("profstat"+i)).setValue(i<msg.length?msg[i]:"");
   }
 }
-
-
-

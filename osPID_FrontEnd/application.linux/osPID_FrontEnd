@@ -1,4 +1,0 @@
-#!/bin/sh
-
-APPDIR=$(dirname "$0")
-java  -Djava.library.path="$APPDIR" -cp "$APPDIR/lib/osPID_FrontEnd.jar:$APPDIR/lib/core.jar:$APPDIR/lib/serial.jar:$APPDIR/lib/RXTXcomm.jar:$APPDIR/lib/controlP5.jar" osPID_FrontEnd
