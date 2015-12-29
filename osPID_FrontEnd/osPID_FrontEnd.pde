@@ -117,11 +117,6 @@ void setup()
   PrefsToVals(); //read pref array into global variables
 
   ReadProfiles(sketchPath("") + File.separator + "profiles");
-<<<<<<< HEAD
-=======
-
-
->>>>>>> 8b4940155cf6bcab60dfeb16074d2ed29ea37a0e
 
   controlP5 = new ControlP5(this);                                  // * Initialize the various
 
@@ -356,21 +351,4 @@ void ATune_CMD() {
   {
     ATLabel.setValue("OFF");
   }
-<<<<<<< HEAD
 }
-=======
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
->>>>>>> 8b4940155cf6bcab60dfeb16074d2ed29ea37a0e
