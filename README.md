@@ -14,6 +14,7 @@
  * http://www.sojamo.de/libraries/controlP5/
  * 
  ********************************************************/
+
 Updates for version 0.7
 - Support for Processing v3.0.1
 - Support for ControlP5 v2.2.5 
